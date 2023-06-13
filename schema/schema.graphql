@@ -1,0 +1,119 @@
+scalar Date
+
+type User {
+  id: Int!
+  email: String!
+  password: String!
+}
+
+type Book {
+  id: Int!
+  title: String!
+  author: String!
+  yearOfPublication: Int!
+  genres: [Genre]
+  rating: Int!
+  status: BookStatus!
+  createdAt: Date!
+  updatedAt: Date!
+  borrower: User
+}
+
+enum BookStatus {
+  NEW
+  EDITED
+  DELETED
+}
+
+type Genre {
+  id: Int!
+  name: Genres!
+}
+
+enum Genres {
+  FANTASY
+  SCIENCE_FICTION
+  HORROR
+  ROMANCE
+  THRILLER
+  MYSTERY
+  WESTERN
+  DYSTOPIA
+  MEMOIR
+  BIOGRAPHY
+  PLAY
+  POETRY
+  HISTORY
+  TRAVEL
+  CHILDRENS
+  YOUNG_ADULT
+  OTHER
+}
+
+# type BikeRentQueryResposne {
+#   bikeModel: String!
+#   customerName: String!
+#   rentDate: Date!
+#   paidTime: Int! # hours
+# }
+
+type LogInResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  # token: String
+  user: User
+}
+
+type FindBooksResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  books: [Book]
+}
+
+type GetBookResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  book: Book
+}
+
+type GetAllBooksResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  books: [Book]
+}
+
+type Query {
+#   bikes: [Bike]
+#   rents: [BikeRentQueryResposne]
+#   freeBikes: [Bike]
+#   bikeHistory(bikeId: ID!): [BikeRent]
+  logIn(email: String!, password: String!): LogInResponse
+  getAllFreeBooks: GetAllBooksResponse
+  getBookByIdAndDate(id: Int!, date: Date): GetBookResponse
+  findBooksByTitle(title: String!): FindBooksResponse
+  findBooksByAuthor(author: String!): FindBooksResponse
+}
+
+type AddBookMutationResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  book: Book
+}
+
+# type RentABikeMutationResponse {
+#   code: String!
+#   success: Boolean!
+#   message: String!
+#   rent: BikeRent
+# }
+
+type Mutation {
+  addBook(title: String!, author: String!, yearOfPublication: Int!, genres: [Genres]!): AddBookMutationResponse
+  # addCustomer(name: String, surename: String): AddCustomerMutationResponse
+  # rentABike(bikeId: ID, clientId: ID, rentTime: Int): RentABikeMutationResponse
+}
