@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fieldReference"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+// User: email, password
+// Book: title, author, year of publication, genres, rating
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  password        String
+  borrowedBooks   Book[]  @relation("borrowedBooks")
+}
+
+model Book {
+  id               Int      @id @default(autoincrement())
+  title            String   @unique
+  author           String
+  yearOfPublication Int
+  genres           Genre[]  @relation("bookGenres")
+  rating           Int
+  status           BookStatus @default(NEW)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  borrower         User?     @relation("borrowedBooks", fields: [borrowerId], references: [id])
+  borrowerId       Int?
+}
+
+model Genre {
+  id               Int      @id @default(autoincrement())
+  name             Genres
+  book             Book     @relation("bookGenres", fields:[bookId], references: [id])
+  bookId           Int
+}
+
+enum Genres {
+  FANTASY
+  SCIENCE_FICTION
+  HORROR
+  ROMANCE
+  THRILLER
+  MYSTERY
+  WESTERN
+  DYSTOPIA
+  MEMOIR
+  BIOGRAPHY
+  PLAY
+  POETRY
+  HISTORY
+  TRAVEL
+  CHILDRENS
+  YOUNG_ADULT
+  OTHER
+}
+
+enum BookStatus {
+  NEW
+  EDITED
+  DELETED
+}

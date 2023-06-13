@@ -7,7 +7,8 @@
     "start": "nodemon --exec babel-node index.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed-data": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} ./prisma/seed.ts"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   "homepage": "https://github.com/VESTBERRY/Test-backend-assigmnet#readme",
   "dependencies": {
     "@babel/cli": "^7.11.6",
+    "@prisma/client": "^4.15.0",
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "graphql": "^15.3.0",
@@ -46,6 +48,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "prisma": "^4.15.0",
+    "ts-node": "^10.9.1"
   }
 }
