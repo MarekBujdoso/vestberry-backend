@@ -52,6 +52,15 @@ const USERS = [
 ]
 
 async function main () {
+  for (const user of USERS) {
+    const createdUser = await prisma.user.create({
+      data: user,
+    })
+    console.log(createdUser)
+  }
+  const allUsers = await prisma.user.findMany()
+  console.log(allUsers)
+
   for (const book of BOOKS) {
     const {genres, ...rest} = book
     const createdBook = await prisma.book.create({
@@ -62,17 +71,14 @@ async function main () {
         }
       },
     })
-    console.log(createdBook)
-  }
-
-  for (const user of USERS) {
-    const createdUser = await prisma.user.create({
-      data: user,
+    const createdBookStatus = await prisma.bookChanges.create({
+      data: {
+        bookId: createdBook.id,
+        createdById: allUsers[0].id,
+      },
     })
-    console.log(createdUser)
+    console.log(createdBook, createdBookStatus)
   }
-  const allUsers = await prisma.user.findMany()
-  console.log(allUsers)
 }
 
 main()

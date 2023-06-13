@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed-data": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} ./prisma/seed.ts",
+    "seed-data": "ts-node --esm ./prisma/seed.ts",
     "compile": "npm run generate && tsc",
     "start": "npm run compile && node ./dist/index.js",
     "generate": "graphql-codegen --config codegen.yml"

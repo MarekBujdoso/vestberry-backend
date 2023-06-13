@@ -1,11 +1,22 @@
-import {BookStatus, PrismaClient, Prisma} from '@prisma/client'
+import {BookStatus, BookChanges, PrismaClient, Prisma} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+interface ExtendedBookChange extends BookChanges {
+  title: string,
+  author: string,
+  yearOfPublication: number,
+  rating: number
+}
+
 export const getAllBooks = async (tx: Prisma.TransactionClient = prisma) => {
-  const books = await prisma.book.findMany({
+  const bookChanges: ExtendedBookChange[] = await tx.$queryRaw`SELECT * FROM get_get_book_changes_by_date(NOW()) 
+  WHERE status != ${BookStatus.DELETED}`
+  const books = await tx.book.findMany({
     where: {
-      status: {in: [BookStatus.NEW, BookStatus.EDITED]}
+      id: {
+        in: bookChanges.map((bookChange) => bookChange.bookId),
+      },
     },
   })
   return books

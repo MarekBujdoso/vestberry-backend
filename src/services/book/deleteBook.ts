@@ -2,14 +2,13 @@ import {BookStatus, PrismaClient, Prisma} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export const editBook = async (bookId: number, tx: Prisma.TransactionClient = prisma) => {
-  const deletedBook = await prisma.book.update({
-    where: {
-      id: bookId
-    },
+export const editBook = async (bookId: number, userId: number, tx: Prisma.TransactionClient = prisma) => {
+  const deletedBookChange = await tx.bookChanges.create({
     data: {
-      status: BookStatus.DELETED
+      bookId,
+      status: BookStatus.DELETED,
+      createdById: userId,
     },
   })
-  return deletedBook
+  return deletedBookChange
 }
