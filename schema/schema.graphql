@@ -13,10 +13,17 @@ type Book {
   yearOfPublication: Int!
   genres: [Genre]
   rating: Int!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type BookChange {
+  id: Int!
+  bookId: Int!
   status: BookStatus!
   createdAt: Date!
   updatedAt: Date!
-  borrower: User
+  createdBy: Int!
 }
 
 enum BookStatus {
@@ -87,10 +94,6 @@ type GetAllBooksResponse {
 }
 
 type Query {
-#   bikes: [Bike]
-#   rents: [BikeRentQueryResposne]
-#   freeBikes: [Bike]
-#   bikeHistory(bikeId: ID!): [BikeRent]
   logIn(email: String!, password: String!): LogInResponse
   getAllFreeBooks: GetAllBooksResponse
   getBookByIdAndDate(id: Int!, date: Date): GetBookResponse
