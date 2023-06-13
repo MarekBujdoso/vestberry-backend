@@ -6,7 +6,8 @@ import {startStandaloneServer} from '@apollo/server/standalone'
 import {readFileSync} from 'fs'
 import resolvers from './src/resolvers/index.js'
 import dateScalar from './src/customScalars/dateScalar.js'
-import {Book} from '@prisma/client'
+// import {Book} from '@prisma/client'
+// import BookAPI from './src/dataSources/BookAPI.js'
 
 // const app = express()
 
@@ -14,7 +15,7 @@ const typeDefs = readFileSync('./schema/schema.graphql', {encoding: 'utf-8'})
 
 export interface AppContext {
   dataSources: {
-    books: Book[]
+    // bookAPI: BookAPI
   }
 }
 
@@ -46,7 +47,7 @@ const port = Number.parseInt(process.env.port, 10) || 8000
 const {url} = await startStandaloneServer(server, {
   context: async () => ({
     dataSources: {
-      books: []
+      // bookAPI: new BookAPI(),
     }
   }),
   listen: {port},

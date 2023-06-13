@@ -6,37 +6,59 @@ const BOOKS = [
   {
     title: 'The Great Gatsby',
     author: 'F. Scott Fitzgerald',
-    yearOfPublication: 1925,
-    genres: {
+    changes: {
       create: [
-        {name: Genres.ROMANCE},
-        {name: Genres.FANTASY}
+        {
+          yearOfPublication: 1925,
+
+          createdById: 1,
+          genres: {
+            create: [
+              {name: Genres.ROMANCE},
+              {name: Genres.FANTASY}
+            ],
+          },
+          rating: 3,
+        },
       ],
     },
-    rating: 3,
   },
   {
     title: 'The Da Vinci Code',
     author: 'Dan Brown',
-    yearOfPublication: 2003,
-    genres: {
+    changes: {
       create: [
-        {name: Genres.MYSTERY},
-        {name: Genres.THRILLER},
-      ]
+        {
+          yearOfPublication: 2003,
+          createdById: 1,
+          genres: {
+            create: [
+              {name: Genres.MYSTERY},
+              {name: Genres.THRILLER},
+            ],
+          },
+          rating: 4,
+        },
+      ],
     },
-    rating: 4,
   },
   {
     title: 'The Hobbit',
     author: 'J. R. R. Tolkien',
-    yearOfPublication: 1937,
-    genres: {
+    changes: {
       create: [
-        {name: Genres.FANTASY}
+        {
+          yearOfPublication: 1937,
+          genres: {
+            create: [
+              {name: Genres.FANTASY}
+            ],
+          },
+          rating: 5,
+          createdById: 1,
+        },
       ],
     },
-    rating: 5,
   },
 ]
 
@@ -56,28 +78,22 @@ async function main () {
     const createdUser = await prisma.user.create({
       data: user,
     })
-    console.log(createdUser)
+    console.debug(createdUser)
   }
   const allUsers = await prisma.user.findMany()
-  console.log(allUsers)
+  console.debug(allUsers)
 
   for (const book of BOOKS) {
-    const {genres, ...rest} = book
+    const {changes, ...rest} = book
     const createdBook = await prisma.book.create({
       data: {
         ...rest,
-        genres: {
-          create: genres.create,
+        changes: {
+          create: changes.create,
         }
       },
     })
-    const createdBookStatus = await prisma.bookChanges.create({
-      data: {
-        bookId: createdBook.id,
-        createdById: allUsers[0].id,
-      },
-    })
-    console.log(createdBook, createdBookStatus)
+    console.debug(createdBook)
   }
 }
 

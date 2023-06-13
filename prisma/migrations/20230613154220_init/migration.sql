@@ -18,8 +18,6 @@ CREATE TABLE "Book" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "author" TEXT NOT NULL,
-    "yearOfPublication" INTEGER NOT NULL,
-    "rating" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -30,6 +28,8 @@ CREATE TABLE "Book" (
 CREATE TABLE "BookChanges" (
     "id" SERIAL NOT NULL,
     "status" "BookStatus" NOT NULL DEFAULT 'NEW',
+    "yearOfPublication" INTEGER NOT NULL,
+    "rating" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdById" INTEGER NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE "BookChanges" (
 CREATE TABLE "Genre" (
     "id" SERIAL NOT NULL,
     "name" "Genres" NOT NULL,
-    "bookId" INTEGER NOT NULL,
+    "bookChangeId" INTEGER NOT NULL,
 
     CONSTRAINT "Genre_pkey" PRIMARY KEY ("id")
 );
@@ -60,4 +60,4 @@ ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_createdById_fkey" FOREIGN 
 ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Genre" ADD CONSTRAINT "Genre_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Genre" ADD CONSTRAINT "Genre_bookChangeId_fkey" FOREIGN KEY ("bookChangeId") REFERENCES "BookChanges"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

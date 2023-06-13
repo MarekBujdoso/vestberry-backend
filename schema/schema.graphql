@@ -10,9 +10,7 @@ type Book {
   id: Int!
   title: String!
   author: String!
-  yearOfPublication: Int!
-  genres: [Genre]
-  rating: Int!
+  changes: [BookChange!]!
   createdAt: Date!
   updatedAt: Date!
 }
@@ -21,6 +19,9 @@ type BookChange {
   id: Int!
   bookId: Int!
   status: BookStatus!
+  yearOfPublication: Int!
+  genres: [Genre]
+  rating: Int!
   createdAt: Date!
   updatedAt: Date!
   createdBy: Int!
@@ -96,7 +97,7 @@ type GetAllBooksResponse {
 type Query {
   logIn(email: String!, password: String!): LogInResponse
   getAllFreeBooks: GetAllBooksResponse
-  getBookByIdAndDate(id: Int!, date: Date): GetBookResponse
+  getBookByIdAndDate(id: Int!, stringDate: String!): GetBookResponse
   findBooksByTitle(title: String!): FindBooksResponse
   findBooksByAuthor(author: String!): FindBooksResponse
 }
