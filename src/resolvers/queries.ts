@@ -43,7 +43,6 @@ const queries: QueryResolvers = {
     },
     getBookByIdAndDate: async (_, {id, stringDate}) => {
       const books = await getAllBooks(new Date(stringDate), prisma)
-      console.log(books, stringDate, id)
       const book = books.find(({id: bookId}) => bookId === id)
       return {
         code: '200',
