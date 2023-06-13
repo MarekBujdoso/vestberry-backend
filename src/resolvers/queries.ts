@@ -33,7 +33,7 @@ export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClien
 const queries: QueryResolvers = {
   Query: {
     getAllFreeBooks: async (_, __) => {
-      const [books] = await getAllBooks(new Date(), prisma)
+      const books = await getAllBooks(new Date(), prisma)
       return {
         code: '200',
         success: true,
