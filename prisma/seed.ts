@@ -16,18 +16,12 @@ const BOOKS = [
   {
     title: 'The Great Gatsby',
     author: 'F. Scott Fitzgerald',
+    genres: Genres.ROMANCE,
     changes: {
       create: [
         {
           yearOfPublication: 1925,
-
           createdById: 1,
-          genres: {
-            create: [
-              {name: Genres.ROMANCE},
-              {name: Genres.FANTASY}
-            ],
-          },
           rating: 3,
         },
       ],
@@ -36,17 +30,12 @@ const BOOKS = [
   {
     title: 'The Da Vinci Code',
     author: 'Dan Brown',
+    genres: Genres.MYSTERY,
     changes: {
       create: [
         {
           yearOfPublication: 2003,
           createdById: 1,
-          genres: {
-            create: [
-              {name: Genres.MYSTERY},
-              {name: Genres.THRILLER},
-            ],
-          },
           rating: 4,
         },
       ],
@@ -55,15 +44,11 @@ const BOOKS = [
   {
     title: 'The Hobbit',
     author: 'J. R. R. Tolkien',
+    genres: Genres.FANTASY,
     changes: {
       create: [
         {
           yearOfPublication: 1937,
-          genres: {
-            create: [
-              {name: Genres.FANTASY}
-            ],
-          },
           rating: 5,
           createdById: 1,
         },

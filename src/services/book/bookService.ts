@@ -8,7 +8,7 @@ interface Book {
   author: string;
   yearOfPublication: number;
   rating: number;
-  genres: string[];
+  genres: Genres;
 }
 
 class BookService {
@@ -21,10 +21,10 @@ class BookService {
     }
 
     const newBook = await prisma.book.create({
-      data: {title, author}
+      data: {title, author, genres}
     })
 
-    const newBookChange = await prisma.bookChanges.create({
+    await prisma.bookChanges.create({
       data: {
         yearOfPublication,
         rating,
@@ -33,9 +33,9 @@ class BookService {
       }
     })
 
-    await prisma.genre.createMany({
-      data: genres.map((name: Genres) => ({name, bookChangeId: newBookChange.id}))
-    })
+    // await prisma.genre.createMany({
+    //   data: genres.map((name: Genres) => ({name, bookChangeId: newBookChange.id}))
+    // })
 
     return await prisma.book.findUnique({
       where: {
@@ -44,7 +44,6 @@ class BookService {
       include: {
         changes: {
           include: {
-            genres: true,
             createdBy: true,
           },
         },
@@ -93,7 +92,6 @@ class BookService {
             id: newBookChange.id,
           },
           include: {
-            genres: true,
             createdBy: true,
           },
         },

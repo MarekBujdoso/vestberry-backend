@@ -25,6 +25,7 @@ model Book {
   id                Int     @id @default(autoincrement())
   title             String  @unique
   author            String
+  genres            Genres
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -36,7 +37,6 @@ model BookChanges {
   id                Int        @id @default(autoincrement())
   status            BookStatus @default(NEW)
   yearOfPublication Int
-  genres            Genre[] @relation("bookGenres")
   rating            Int
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
@@ -45,13 +45,6 @@ model BookChanges {
 
   book   Book @relation("bookChanges", fields: [bookId], references: [id])
   bookId Int
-}
-
-model Genre {
-  id            Int    @id @default(autoincrement())
-  name          Genres
-  bookChange    BookChanges   @relation("bookGenres", fields: [bookChangeId], references: [id])
-  bookChangeId  Int
 }
 
 enum Genres {

@@ -1,8 +1,5 @@
--- This is an empty migration.
-
-
 CREATE OR REPLACE FUNCTION public.get_book_changes_by_date(related_date timestamp with time zone)
-RETURNS TABLE("bookChangeId" integer, "bookId" integer, status "BookStatus", "createdById" integer, "createdAt" timestamp without time zone, "updatedAt" timestamp without time zone, title text, author text, "yearOfPublication" integer, rating integer)
+RETURNS TABLE("bookChangeId" integer, "bookId" integer, status "BookStatus", "createdById" integer, "createdAt" timestamp without time zone, "updatedAt" timestamp without time zone, title text, author text, genres "Genres", "yearOfPublication" integer, rating integer)
 LANGUAGE plpgsql
 AS $function$
 BEGIN 
@@ -16,6 +13,7 @@ BEGIN
     bc."updatedAt",
     book.title,
     book.author,
+    book.genres,
     bc."yearOfPublication",
     bc.rating
   FROM

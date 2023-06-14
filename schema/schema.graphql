@@ -10,6 +10,7 @@ type Book {
   id: Int!
   title: String!
   author: String!
+  genres: Genres!
   changes: [BookChange!]!
   createdAt: Date!
   updatedAt: Date!
@@ -20,7 +21,6 @@ type BookChange {
   bookId: Int!
   status: BookStatus!
   yearOfPublication: Int!
-  genres: [Genre]
   rating: Int!
   createdAt: Date!
   updatedAt: Date!
@@ -31,11 +31,6 @@ enum BookStatus {
   NEW
   EDITED
   DELETED
-}
-
-type Genre {
-  id: Int!
-  name: Genres!
 }
 
 enum Genres {
@@ -110,9 +105,7 @@ type BookMutationResponse {
 }
 
 type Mutation {
-  addBook(title: String!, author: String!, yearOfPublication: Int!, rating: Int!, genres: [Genres]!): BookMutationResponse
+  addBook(title: String!, author: String!, yearOfPublication: Int!, rating: Int!, genres: Genres!): BookMutationResponse
   deleteBook(id: Int!): BookMutationResponse
   registerUser(email: String!, password: String!): LogInResponse
-  # addCustomer(name: String, surename: String): AddCustomerMutationResponse
-  # rentABike(bikeId: ID, clientId: ID, rentTime: Int): RentABikeMutationResponse
 }

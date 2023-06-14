@@ -28,7 +28,6 @@ export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClien
           },
         },
         include: {
-          genres: true,
           createdBy: true,
         },
       },
@@ -90,7 +89,6 @@ const queries: QueryResolvers = {
         include: {
           changes: {
             include: {
-              genres: true,
               createdBy: true,
             },
           },
@@ -114,7 +112,6 @@ const queries: QueryResolvers = {
         include: {
           changes: {
             include: {
-              genres: true,
               createdBy: true,
             },
           },

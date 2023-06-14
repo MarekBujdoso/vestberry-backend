@@ -18,6 +18,7 @@ CREATE TABLE "Book" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "author" TEXT NOT NULL,
+    "genres" "Genres" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -38,15 +39,6 @@ CREATE TABLE "BookChanges" (
     CONSTRAINT "BookChanges_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Genre" (
-    "id" SERIAL NOT NULL,
-    "name" "Genres" NOT NULL,
-    "bookChangeId" INTEGER NOT NULL,
-
-    CONSTRAINT "Genre_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -58,6 +50,3 @@ ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_createdById_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Genre" ADD CONSTRAINT "Genre_bookChangeId_fkey" FOREIGN KEY ("bookChangeId") REFERENCES "BookChanges"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
