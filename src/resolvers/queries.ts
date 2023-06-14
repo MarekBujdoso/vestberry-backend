@@ -1,5 +1,6 @@
 import {BookChanges, Prisma, PrismaClient} from '@prisma/client'
 import {QueryResolvers} from '../gql/resolvers-types'
+// import authorization from '../services/user/authorization'
 
 const prisma = new PrismaClient()
 
@@ -40,7 +41,16 @@ export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClien
 // Use the generated `QueryResolvers` type to type check our queries!
 const queries: QueryResolvers = {
   Query: {
-    getAllFreeBooks: async (_, __) => {
+    getAllFreeBooks: async (_, __, {isAuthenticated}) => {
+      if (!isAuthenticated) {
+        return {
+          code: '401',
+          success: false,
+          message: 'Unauthorized',
+          books: [],
+        }
+      }
+
       const books = await getAllBooks(new Date(), prisma)
 
       return {
@@ -50,7 +60,16 @@ const queries: QueryResolvers = {
         books,
       }
     },
-    getBookByIdAndDate: async (_, {id, stringDate}) => {
+    getBookByIdAndDate: async (_, {id, stringDate}, {isAuthenticated}) => {
+      if (!isAuthenticated) {
+        return {
+          code: '401',
+          success: false,
+          message: 'Unauthorized',
+          book: null,
+        }
+      }
+
       const books = await getAllBooks(new Date(stringDate), prisma)
       const book = books.find(({id: bookId}) => bookId === id)
 
@@ -107,6 +126,25 @@ const queries: QueryResolvers = {
         success: true,
         message: 'books by author',
         books,
+      }
+    },
+    logIn: async (_, {email, password}, {authAPI}) => {
+      const user = await authAPI.login(email, password)
+
+      if (!user) {
+        return {
+          code: '401',
+          success: false,
+          message: 'Unauthorized',
+          user: null,
+        }
+      }
+
+      return {
+        code: '200',
+        success: true,
+        message: 'user logged in',
+        user,
       }
     },
   },

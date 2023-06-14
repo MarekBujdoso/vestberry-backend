@@ -6,6 +6,12 @@ import {startStandaloneServer} from '@apollo/server/standalone'
 import {readFileSync} from 'fs'
 import resolvers from './src/resolvers/index.js'
 import dateScalar from './src/customScalars/dateScalar.js'
+import autorization from './src/services/user/authorization.js'
+import decode from './src/utils/token/decode.js'
+// import encode from './src/utils/token/encode.js'
+import verifyUser from './src/services/user/verifyUser.js'
+import {User} from '@prisma/client'
+// import {GraphQLError} from 'graphql/error/GraphQLError.js'
 // import {Book} from '@prisma/client'
 // import BookAPI from './src/dataSources/BookAPI.js'
 
@@ -13,10 +19,24 @@ import dateScalar from './src/customScalars/dateScalar.js'
 
 const typeDefs = readFileSync('./schema/schema.graphql', {encoding: 'utf-8'})
 
-export interface AppContext {
-  dataSources: {
-    // bookAPI: BookAPI
+const getUser = async (token: string) => {
+  const userData = decode(token)
+  if (!userData) {
+    return null
   }
+  const {id, email} = userData
+
+  return await verifyUser(id, email)
+}
+
+export interface AppContext {
+  user: User;
+  isAuthenticated: boolean;
+  authAPI: typeof autorization;
+  // user: UserInterface;
+  // dataSources: {
+  //   // bookAPI: BookAPI
+  // }
 }
 
 // const schema = makeExecutableSchema({
@@ -45,11 +65,26 @@ const server = new ApolloServer<AppContext>({
 const port = Number.parseInt(process.env.port, 10) || 8000
 
 const {url} = await startStandaloneServer(server, {
-  context: async () => ({
-    dataSources: {
-      // bookAPI: new BookAPI(),
-    }
-  }),
+  context: async ({req}) => {
+    const token = req.headers.authorization || ''
+
+    const user = await getUser(token)
+    console.log('user', user)
+    // optionally block the user
+    // we could also check user roles/permissions here
+    // if (!user) {
+    //   // throwing a `GraphQLError` here allows us to specify an HTTP status code,
+    //   // standard `Error`s will have a 500 status code by default
+    //   throw new GraphQLError('User is not authenticated', {
+    //     extensions: {
+    //       code: 'UNAUTHENTICATED',
+    //       http: {status: 401},
+    //     },
+    //   })
+    // }
+    // add the user to the context
+    return {user, isAuthenticated: !!user, authAPI: autorization}
+  },
   listen: {port},
 })
 
@@ -60,3 +95,5 @@ const {url} = await startStandaloneServer(server, {
 // })
 
 console.debug(`🚀  Server is running at: ${url}`)
+
+// console.debug(encode({id: 1, email: 'aaa@vestberry.com'}))
