@@ -8,9 +8,10 @@ import resolvers from './src/resolvers/index.js'
 import dateScalar from './src/customScalars/dateScalar.js'
 import autorization from './src/services/user/authorization.js'
 import decode from './src/utils/token/decode.js'
-// import encode from './src/utils/token/encode.js'
+import encode from './src/utils/token/encode.js'
 import verifyUser from './src/services/user/verifyUser.js'
 import {User} from '@prisma/client'
+import bookService from './src/services/book/bookService.js'
 // import {GraphQLError} from 'graphql/error/GraphQLError.js'
 // import {Book} from '@prisma/client'
 // import BookAPI from './src/dataSources/BookAPI.js'
@@ -33,6 +34,7 @@ export interface AppContext {
   user: User;
   isAuthenticated: boolean;
   authAPI: typeof autorization;
+  bookAPI: typeof bookService;
   // user: UserInterface;
   // dataSources: {
   //   // bookAPI: BookAPI
@@ -83,7 +85,7 @@ const {url} = await startStandaloneServer(server, {
     //   })
     // }
     // add the user to the context
-    return {user, isAuthenticated: !!user, authAPI: autorization}
+    return {user, isAuthenticated: !!user, authAPI: autorization, bookAPI: bookService}
   },
   listen: {port},
 })
@@ -96,4 +98,4 @@ const {url} = await startStandaloneServer(server, {
 
 console.debug(`🚀  Server is running at: ${url}`)
 
-// console.debug(encode({id: 1, email: 'aaa@vestberry.com'}))
+console.debug(encode({id: 1, email: 'aaa@vestberry.com'}))
