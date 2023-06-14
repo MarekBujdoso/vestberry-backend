@@ -11,6 +11,35 @@ interface Book {
   genres: Genres;
 }
 
+interface BookChange {
+  bookId: number;
+  yearOfPublication?: number;
+  rating?: number;
+}
+
+async function findLastBookChange (bookId: number) {
+  const findBook = await prisma.book.findFirst({where: {id: bookId}})
+  if (!findBook) {
+    // Book does not exist.
+    return null
+  }
+
+  const lastBookChange = await prisma.bookChanges.findFirst({
+    where: {
+      bookId,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  })
+
+  if (!lastBookChange || lastBookChange.status === BookStatus.DELETED) {
+    return null
+  }
+
+  return lastBookChange
+}
+
 class BookService {
   async addBook ({title, author, yearOfPublication, rating, genres}: Book, userId: number) {
     const findBook = await prisma.book.findUnique({where: {title}})
@@ -52,22 +81,9 @@ class BookService {
   }
 
   async deleteBook ({id}: {id: number}, userId: number) {
-    const findBook = await prisma.book.findFirst({where: {id}})
-    if (!findBook) {
-      // Book does not exist.
-      return null
-    }
+    const lastBookChange = await findLastBookChange(id)
 
-    const lastBookChange = await prisma.bookChanges.findFirst({
-      where: {
-        bookId: id,
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    })
-
-    if (!lastBookChange || lastBookChange.status === BookStatus.DELETED) {
+    if (!lastBookChange) {
       return null
     }
 
@@ -85,6 +101,40 @@ class BookService {
     return await prisma.book.findFirst({
       where: {
         id,
+      },
+      include: {
+        changes: {
+          where: {
+            id: newBookChange.id,
+          },
+          include: {
+            createdBy: true,
+          },
+        },
+      },
+    })
+  }
+
+  async editBook ({bookId, yearOfPublication, rating}: BookChange, userId: number) {
+    const lastBookChange = await findLastBookChange(bookId)
+
+    if (!lastBookChange) {
+      return null
+    }
+
+    const newBookChange = await prisma.bookChanges.create({
+      data: {
+        yearOfPublication: yearOfPublication || lastBookChange.yearOfPublication,
+        rating: rating || lastBookChange.rating,
+        bookId,
+        createdById: userId,
+        status: BookStatus.EDITED,
+      }
+    })
+
+    return await prisma.book.findFirst({
+      where: {
+        id: bookId,
       },
       include: {
         changes: {

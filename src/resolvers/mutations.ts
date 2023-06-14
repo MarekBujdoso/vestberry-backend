@@ -77,6 +77,34 @@ const mutations: MutationResolvers = {
         user,
       }
     },
+    editBook: async (_, {bookId, yearOfPublication, rating}, {user, bookAPI, isAuthenticated}) => {
+      if (!isAuthenticated) {
+        return {
+          code: '401',
+          success: false,
+          message: 'Unauthorized',
+          book: null,
+        }
+      }
+
+      const editedBook = await bookAPI.editBook({bookId, yearOfPublication, rating}, user.id)
+
+      if (!editedBook) {
+        return {
+          code: '400',
+          success: false,
+          message: 'Edit book failed',
+          book: null,
+        }
+      }
+
+      return {
+        code: '200',
+        success: true,
+        message: 'Book edited!',
+        book: editedBook,
+      }
+    },
   },
 }
 

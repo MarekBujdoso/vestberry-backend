@@ -108,4 +108,5 @@ type Mutation {
   addBook(title: String!, author: String!, yearOfPublication: Int!, rating: Int!, genres: Genres!): BookMutationResponse
   deleteBook(id: Int!): BookMutationResponse
   registerUser(email: String!, password: String!): LogInResponse
+  editBook(bookId: Int!, yearOfPublication: Int, rating: Int): BookMutationResponse
 }
