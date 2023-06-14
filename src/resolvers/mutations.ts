@@ -59,6 +59,24 @@ const mutations: MutationResolvers = {
         book: deletedBook,
       }
     },
+    registerUser: async (_, {email, password}, {authAPI}) => {
+      const user = await authAPI.register(email, password)
+      if (!user) {
+        return {
+          code: '400',
+          success: false,
+          message: 'Registration failed',
+          user: null,
+        }
+      }
+
+      return {
+        code: '200',
+        success: true,
+        message: 'user registered',
+        user,
+      }
+    },
   },
 }
 

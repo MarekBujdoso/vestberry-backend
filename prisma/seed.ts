@@ -1,6 +1,16 @@
 import {Genres, PrismaClient} from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
+
+prisma.$use(async (params, next) => {
+  if (params.model === 'User' && params.action === 'create') {
+    const {password} = params.args.data
+    const salt = bcrypt.genSaltSync(10)
+    params.args.data.password = bcrypt.hashSync(password, salt)
+  }
+  return next(params)
+})
 
 const BOOKS = [
   {
@@ -64,7 +74,7 @@ const BOOKS = [
 
 const USERS = [
   {
-    email: 'aaa@vestebry.com',
+    email: 'aaa@vestberry.com',
     password: 'aaa',
   },
   {
