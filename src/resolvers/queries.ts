@@ -28,10 +28,12 @@ export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClien
         },
         include: {
           genres: true,
+          createdBy: true,
         },
       },
     },
   })
+
   return books
 }
 
@@ -40,6 +42,7 @@ const queries: QueryResolvers = {
   Query: {
     getAllFreeBooks: async (_, __) => {
       const books = await getAllBooks(new Date(), prisma)
+
       return {
         code: '200',
         success: true,
@@ -50,27 +53,62 @@ const queries: QueryResolvers = {
     getBookByIdAndDate: async (_, {id, stringDate}) => {
       const books = await getAllBooks(new Date(stringDate), prisma)
       const book = books.find(({id: bookId}) => bookId === id)
+
       return {
         code: '200',
         success: true,
-        message: 'book',
+        message: `book by ${id} and ${stringDate}`,
         book,
       }
     },
+    findBooksByTitle: async (_, {title}) => {
+      const books = await prisma.book.findMany({
+        where: {
+          title: {
+            contains: title,
+          },
+        },
+        include: {
+          changes: {
+            include: {
+              genres: true,
+              createdBy: true,
+            },
+          },
+        },
+      })
 
-  //   freeBikes: (_, __, { dataSources }) => {
-  //     return dataSources.bikes.filter(({ isBorrowed }) => !isBorrowed);
-  // }
-  //   rents: (_, __, { dataSources }) => {
-  //     const { rents, bikes, customers } = dataSources;
-  //     return rents.map(({ bikeId, customerId, rentDate, paidTime }) => ({
-  //       bikeModel: bikes.find(({ id }) => id === bikeId).model,
-  //       customerName: customers.find(({ id }) => id === customerId)
-  //         .surename,
-  //       rentDate,
-  //       paidTime,
-  //     }));
-  //   },
+      return {
+        code: '200',
+        success: true,
+        message: 'books by title',
+        books,
+      }
+    },
+    findBooksByAuthor: async (_, {author}) => {
+      const books = await prisma.book.findMany({
+        where: {
+          author: {
+            contains: author,
+          },
+        },
+        include: {
+          changes: {
+            include: {
+              genres: true,
+              createdBy: true,
+            },
+          },
+        },
+      })
+
+      return {
+        code: '200',
+        success: true,
+        message: 'books by author',
+        books,
+      }
+    },
   },
 }
 

@@ -24,7 +24,7 @@ type BookChange {
   rating: Int!
   createdAt: Date!
   updatedAt: Date!
-  createdBy: Int!
+  createdBy: User!
 }
 
 enum BookStatus {
