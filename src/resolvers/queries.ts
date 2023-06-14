@@ -6,6 +6,7 @@ const prisma = new PrismaClient()
 interface ExtendedBookChange extends BookChanges {
   title: string,
   author: string,
+  bookChangeId: number,
 }
 
 export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClient = prisma) => {
@@ -20,6 +21,11 @@ export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClien
     },
     include: {
       changes: {
+        where: {
+          id: {
+            in: bookChanges.map((bookChange) => bookChange.bookChangeId),
+          },
+        },
         include: {
           genres: true,
         },
