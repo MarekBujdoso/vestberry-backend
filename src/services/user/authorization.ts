@@ -2,24 +2,22 @@ import {PrismaClient} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export interface RegisterLoginInput {
-  email: string;
-  password: string;
-}
-
 class Authorization {
-//   async register(input: RegisterLoginInput): Promise<User | null> {
-//     if (await User.findOne({ where: { email: input.email } })) return null;
+  async register (email: string, password: string) {
+    const findUser = await prisma.user.findUnique({where: {email}})
 
-//     return User.create({ ...input });
-//   }
+    if (findUser) {
+      // User already exists.
+      return null
+    }
+
+    return await prisma.user.create({
+      data: {email, password}
+    })
+  }
 
   async login (email: string, password: string) {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      }
-    })
+    const user = await prisma.user.findUnique({where: {email}})
 
     if (!user) {
       return null
