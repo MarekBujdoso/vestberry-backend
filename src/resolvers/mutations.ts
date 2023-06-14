@@ -1,16 +1,18 @@
 import {MutationResolvers} from '../gql/resolvers-types'
 
+const UNAUTHENTICATED_BOOK_RESPONSE = {
+  code: '401',
+  success: false,
+  message: 'Unauthorized',
+  book: null,
+}
+
 // Use the generated `MutationResolvers` type to type check our mutations!
 const mutations: MutationResolvers = {
   Mutation: {
     addBook: async (_, {title, author, yearOfPublication, rating, genres}, {user, bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          book: null,
-        }
+        return UNAUTHENTICATED_BOOK_RESPONSE
       }
 
       const newBook = await bookAPI.addBook({title, author, yearOfPublication, rating, genres}, user.id)
@@ -33,12 +35,7 @@ const mutations: MutationResolvers = {
     },
     deleteBook: async (_, {id}, {user, bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          book: null,
-        }
+        return UNAUTHENTICATED_BOOK_RESPONSE
       }
 
       const deletedBook = await bookAPI.deleteBook({id}, user.id)
@@ -79,12 +76,7 @@ const mutations: MutationResolvers = {
     },
     editBook: async (_, {bookId, yearOfPublication, rating}, {user, bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          book: null,
-        }
+        return UNAUTHENTICATED_BOOK_RESPONSE
       }
 
       const editedBook = await bookAPI.editBook({bookId, yearOfPublication, rating}, user.id)
