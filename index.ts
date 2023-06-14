@@ -13,8 +13,6 @@ import verifyUser from './src/services/user/verifyUser.js'
 import {User} from '@prisma/client'
 import bookService from './src/services/book/bookService.js'
 // import {GraphQLError} from 'graphql/error/GraphQLError.js'
-// import {Book} from '@prisma/client'
-// import BookAPI from './src/dataSources/BookAPI.js'
 
 // const app = express()
 
@@ -36,9 +34,6 @@ export interface AppContext {
   authAPI: typeof autorization;
   bookAPI: typeof bookService;
   // user: UserInterface;
-  // dataSources: {
-  //   // bookAPI: BookAPI
-  // }
 }
 
 // const schema = makeExecutableSchema({
