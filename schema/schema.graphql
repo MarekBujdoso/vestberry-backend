@@ -53,13 +53,6 @@ enum Genres {
   OTHER
 }
 
-# type BikeRentQueryResposne {
-#   bikeModel: String!
-#   customerName: String!
-#   rentDate: Date!
-#   paidTime: Int! # hours
-# }
-
 type LogInResponse {
   code: String!
   success: Boolean!
