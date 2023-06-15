@@ -6,7 +6,7 @@ import dateScalar from './src/customScalars/dateScalar.js'
 import autorization from './src/services/user/authorization.js'
 import decode from './src/utils/token/decode.js'
 import encode from './src/utils/token/encode.js'
-import verifyUser from './src/services/user/verifyUser.js'
+import findUser from './src/services/user/findUser.js'
 import {User} from '@prisma/client'
 import bookService from './src/services/book/bookService.js'
 
@@ -19,7 +19,7 @@ const getUser = async (token: string) => {
   }
   const {id, email} = userData
 
-  return await verifyUser(id, email)
+  return await findUser(id, email)
 }
 
 export interface AppContext {

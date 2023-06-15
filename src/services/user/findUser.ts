@@ -2,7 +2,7 @@ import {PrismaClient} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const verifyUser = (id: number, email: string) => {
+const findUser = (id: number, email: string) => {
   return prisma.user.findUnique({
     where: {
       email,
@@ -10,4 +10,4 @@ const verifyUser = (id: number, email: string) => {
   })
 }
 
-export default verifyUser
+export default findUser

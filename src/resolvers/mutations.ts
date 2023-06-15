@@ -1,5 +1,6 @@
 import {MutationResolvers} from '../gql/resolvers-types'
 import {UNAUTHENTICATED_BOOK_RESPONSE} from './resolverConstants.js'
+import {createFailureResponseByType, createSuccessResponseByType} from '../utils/resolvers/resolverUtils.js'
 
 // Use the generated `MutationResolvers` type to type check our mutations!
 const mutations: MutationResolvers = {
@@ -12,20 +13,10 @@ const mutations: MutationResolvers = {
       const newBook = await bookAPI.addBook({title, author, yearOfPublication, rating, genres}, user.id)
 
       if (!newBook) {
-        return {
-          code: '400',
-          success: false,
-          message: 'Add book failed',
-          book: null,
-        }
+        return createFailureResponseByType('book', 'Add book failed')
       }
 
-      return {
-        code: '200',
-        success: true,
-        message: 'New book added!',
-        book: newBook,
-      }
+      return createSuccessResponseByType('book', 'New book added!', newBook)
     },
     deleteBook: async (_, {id}, {user, bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
@@ -35,38 +26,18 @@ const mutations: MutationResolvers = {
       const deletedBook = await bookAPI.deleteBook({id}, user.id)
 
       if (!deletedBook) {
-        return {
-          code: '400',
-          success: false,
-          message: 'Delete book failed',
-          book: null,
-        }
+        return createFailureResponseByType('book', 'Delete book failed')
       }
 
-      return {
-        code: '200',
-        success: true,
-        message: 'Book deleted!',
-        book: deletedBook,
-      }
+      return createSuccessResponseByType('book', 'Book deleted!', deletedBook)
     },
     registerUser: async (_, {email, password}, {authAPI}) => {
       const user = await authAPI.register(email, password)
       if (!user) {
-        return {
-          code: '400',
-          success: false,
-          message: 'Registration failed',
-          user: null,
-        }
+        return createFailureResponseByType('user', 'User registration failed')
       }
 
-      return {
-        code: '200',
-        success: true,
-        message: 'user registered',
-        user,
-      }
+      return createSuccessResponseByType('user', 'User registered!', user)
     },
     editBook: async (_, {bookId, yearOfPublication, rating}, {user, bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
@@ -76,20 +47,10 @@ const mutations: MutationResolvers = {
       const editedBook = await bookAPI.editBook({bookId, yearOfPublication, rating}, user.id)
 
       if (!editedBook) {
-        return {
-          code: '400',
-          success: false,
-          message: 'Edit book failed',
-          book: null,
-        }
+        return createFailureResponseByType('book', 'Edit book failed')
       }
 
-      return {
-        code: '200',
-        success: true,
-        message: 'Book edited!',
-        book: editedBook,
-      }
+      return createSuccessResponseByType('book', 'Book edited!', editedBook)
     },
   },
 }

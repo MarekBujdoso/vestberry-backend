@@ -1,5 +1,9 @@
-import {BookChanges, BookStatus, Prisma, PrismaClient} from '@prisma/client'
+import {BookStatus, PrismaClient} from '@prisma/client'
 import {Genres} from '../../gql/resolvers-types'
+import loadBookAndIncludeLatest from './loadBookAndIncludeLatest.js'
+import getAllBooks from './getAllBooks.js'
+import findLastBookChange from './findLastBookChange.js'
+import findAllBooksBy from './findAllBooksBy.js'
 
 const prisma = new PrismaClient()
 
@@ -17,88 +21,6 @@ interface BookChange {
   rating?: number;
 }
 
-interface ExtendedBookChange extends BookChanges {
-  title: string,
-  author: string,
-  bookChangeId: number,
-}
-
-async function getAllBooks (relatedDate: Date, skip?: number, take?: number, tx: Prisma.TransactionClient = prisma) {
-  const bookChanges: ExtendedBookChange[] = await tx.$queryRaw`SELECT * FROM get_book_changes_by_date(${relatedDate}) 
-  WHERE status != 'DELETED'`
-
-  const books = await tx.book.findMany({
-    skip,
-    take,
-    where: {
-      id: {
-        in: bookChanges.map((bookChange) => bookChange.bookId),
-      },
-    },
-    include: {
-      changes: {
-        where: {
-          id: {
-            in: bookChanges.map((bookChange) => bookChange.bookChangeId),
-          },
-        },
-        include: {
-          createdBy: true,
-        },
-      },
-    },
-  })
-
-  return books
-}
-
-async function findLastBookChange (bookId: number) {
-  const findBook = await prisma.book.findFirst({where: {id: bookId}})
-  if (!findBook) {
-    // Book does not exist.
-    return null
-  }
-
-  const lastBookChange = await prisma.bookChanges.findFirst({
-    where: {
-      bookId,
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
-
-  if (!lastBookChange || lastBookChange.status === BookStatus.DELETED) {
-    return null
-  }
-
-  return lastBookChange
-}
-
-async function findAllBooksBy (attribute: string, value: string, skip?: number, take?: number) {
-  const books = await prisma.book.findMany({
-    skip,
-    take,
-    where: {
-      [attribute]: {
-        contains: value,
-      },
-    },
-    include: {
-      changes: {
-        include: {
-          createdBy: true,
-        },
-        orderBy: {
-          updatedAt: 'desc',
-        },
-      },
-    },
-  })
-
-  return books
-}
-
 class BookService {
   async addBook ({title, author, yearOfPublication, rating, genres}: Book, userId: number) {
     const findBook = await prisma.book.findUnique({where: {title}})
@@ -112,7 +34,7 @@ class BookService {
       data: {title, author, genres}
     })
 
-    await prisma.bookChanges.create({
+    const newBookChange = await prisma.bookChanges.create({
       data: {
         yearOfPublication,
         rating,
@@ -121,18 +43,7 @@ class BookService {
       }
     })
 
-    return await prisma.book.findUnique({
-      where: {
-        title,
-      },
-      include: {
-        changes: {
-          include: {
-            createdBy: true,
-          },
-        },
-      },
-    })
+    return await loadBookAndIncludeLatest(newBook.id, newBookChange.id)
   }
 
   async deleteBook ({id}: {id: number}, userId: number) {
@@ -153,21 +64,7 @@ class BookService {
       }
     })
 
-    return await prisma.book.findFirst({
-      where: {
-        id,
-      },
-      include: {
-        changes: {
-          where: {
-            id: newBookChange.id,
-          },
-          include: {
-            createdBy: true,
-          },
-        },
-      },
-    })
+    return await loadBookAndIncludeLatest(id, newBookChange.id)
   }
 
   async editBook ({bookId, yearOfPublication, rating}: BookChange, userId: number) {
@@ -187,21 +84,7 @@ class BookService {
       }
     })
 
-    return await prisma.book.findFirst({
-      where: {
-        id: bookId,
-      },
-      include: {
-        changes: {
-          where: {
-            id: newBookChange.id,
-          },
-          include: {
-            createdBy: true,
-          },
-        },
-      },
-    })
+    return await loadBookAndIncludeLatest(bookId, newBookChange.id)
   }
 
   async getAllBooks (relatedDate: Date, skip?: number, take?: number) {

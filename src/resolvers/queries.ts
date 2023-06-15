@@ -4,6 +4,7 @@ import {
   UNAUTHENTICATED_BOOKS_RESPONSE,
   UNAUTHORIZED_USER_RESPONSE
 } from './resolverConstants.js'
+import {createSuccessResponseByType} from '../utils/resolvers/resolverUtils.js'
 
 // Use the generated `QueryResolvers` type to type check our queries!
 const queries: QueryResolvers = {
@@ -15,12 +16,7 @@ const queries: QueryResolvers = {
 
       const books = await bookAPI.getAllBooks(new Date(), skip, take)
 
-      return {
-        code: '200',
-        success: true,
-        message: 'all free books',
-        books,
-      }
+      return createSuccessResponseByType('books', 'all available books', books)
     },
     getBookByIdAndDate: async (_, {id, stringDate, skip, take}, {bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
@@ -30,32 +26,17 @@ const queries: QueryResolvers = {
       const books = await bookAPI.getAllBooks(new Date(stringDate), skip, take)
       const book = books.find(({id: bookId}) => bookId === id)
 
-      return {
-        code: '200',
-        success: true,
-        message: `book by ${id} and ${stringDate}`,
-        book,
-      }
+      return createSuccessResponseByType('book', `book by ${id} and ${stringDate}`, book)
     },
     findBooksByTitle: async (_, {title, skip, take}, {bookAPI}) => {
       const books = await bookAPI.findBooksByTitle(title, skip, take)
 
-      return {
-        code: '200',
-        success: true,
-        message: 'books by title',
-        books,
-      }
+      return createSuccessResponseByType('books', 'books by title', books)
     },
     findBooksByAuthor: async (_, {author, skip, take}, {bookAPI}) => {
       const books = await bookAPI.findBooksByAuthor(author, skip, take)
 
-      return {
-        code: '200',
-        success: true,
-        message: 'books by author',
-        books,
-      }
+      return createSuccessResponseByType('books', 'books by author', books)
     },
     logIn: async (_, {email, password}, {authAPI}) => {
       const user = await authAPI.login(email, password)
@@ -64,12 +45,7 @@ const queries: QueryResolvers = {
         return UNAUTHORIZED_USER_RESPONSE
       }
 
-      return {
-        code: '200',
-        success: true,
-        message: 'user logged in',
-        user,
-      }
+      return createSuccessResponseByType('user', 'user logged in', user)
     },
   },
 }
