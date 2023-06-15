@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fieldReference"]
 }
 
@@ -14,33 +14,37 @@ datasource db {
 // User: email, password
 // Book: title, author, year of publication, genres, rating
 model User {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
-  password        String
-  borrowedBooks   Book[]  @relation("borrowedBooks")
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+
+  userChanges BookChanges[] @relation("userChanges")
 }
 
 model Book {
-  id               Int      @id @default(autoincrement())
-  title            String   @unique
-  author           String
-  yearOfPublication Int
-  genres           Genre[]  @relation("bookGenres")
-  rating           Int
-  status           BookStatus @default(NEW)
+  id                Int     @id @default(autoincrement())
+  title             String  @unique
+  author            String
+  genres            Genres
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
-  borrower         User?     @relation("borrowedBooks", fields: [borrowerId], references: [id])
-  borrowerId       Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  changes BookChanges[] @relation("bookChanges")
 }
 
-model Genre {
-  id               Int      @id @default(autoincrement())
-  name             Genres
-  book             Book     @relation("bookGenres", fields:[bookId], references: [id])
-  bookId           Int
+model BookChanges {
+  id                Int        @id @default(autoincrement())
+  status            BookStatus @default(NEW)
+  yearOfPublication Int
+  rating            Int
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  createdBy         User       @relation("userChanges", fields: [createdById], references: [id])
+  createdById       Int
+
+  book   Book @relation("bookChanges", fields: [bookId], references: [id])
+  bookId Int
 }
 
 enum Genres {

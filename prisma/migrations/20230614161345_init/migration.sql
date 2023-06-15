@@ -18,23 +18,25 @@ CREATE TABLE "Book" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "author" TEXT NOT NULL,
-    "yearOfPublication" INTEGER NOT NULL,
-    "rating" INTEGER NOT NULL,
-    "status" "BookStatus" NOT NULL DEFAULT 'NEW',
+    "genres" "Genres" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "borrowerId" INTEGER,
 
     CONSTRAINT "Book_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Genre" (
+CREATE TABLE "BookChanges" (
     "id" SERIAL NOT NULL,
-    "name" "Genres" NOT NULL,
+    "status" "BookStatus" NOT NULL DEFAULT 'NEW',
+    "yearOfPublication" INTEGER NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdById" INTEGER NOT NULL,
     "bookId" INTEGER NOT NULL,
 
-    CONSTRAINT "Genre_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BookChanges_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -44,7 +46,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Book_title_key" ON "Book"("title");
 
 -- AddForeignKey
-ALTER TABLE "Book" ADD CONSTRAINT "Book_borrowerId_fkey" FOREIGN KEY ("borrowerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Genre" ADD CONSTRAINT "Genre_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "BookChanges" ADD CONSTRAINT "BookChanges_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

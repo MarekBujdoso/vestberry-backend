@@ -1,0 +1,105 @@
+scalar Date
+
+type User {
+  id: Int!
+  email: String!
+  password: String!
+}
+
+type Book {
+  id: Int!
+  title: String!
+  author: String!
+  genres: Genres!
+  changes: [BookChange!]!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type BookChange {
+  id: Int!
+  bookId: Int!
+  status: BookStatus!
+  yearOfPublication: Int!
+  rating: Int!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: User!
+}
+
+enum BookStatus {
+  NEW
+  EDITED
+  DELETED
+}
+
+enum Genres {
+  FANTASY
+  SCIENCE_FICTION
+  HORROR
+  ROMANCE
+  THRILLER
+  MYSTERY
+  WESTERN
+  DYSTOPIA
+  MEMOIR
+  BIOGRAPHY
+  PLAY
+  POETRY
+  HISTORY
+  TRAVEL
+  CHILDRENS
+  YOUNG_ADULT
+  OTHER
+}
+
+type LogInResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  # token: String
+  user: User
+}
+
+type FindBooksResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  books: [Book]
+}
+
+type GetBookResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  book: Book
+}
+
+type GetAllBooksResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  books: [Book]
+}
+
+type Query {
+  logIn(email: String!, password: String!): LogInResponse
+  getAllAvailableBooks(skip: Int, take: Int): GetAllBooksResponse
+  getBookByIdAndDate(id: Int!, stringDate: String!): GetBookResponse
+  findBooksByTitle(title: String!, skip: Int, take: Int): FindBooksResponse
+  findBooksByAuthor(author: String!, skip: Int, take: Int): FindBooksResponse
+}
+
+type BookMutationResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+  book: Book
+}
+
+type Mutation {
+  addBook(title: String!, author: String!, yearOfPublication: Int!, rating: Int!, genres: Genres!): BookMutationResponse
+  deleteBook(id: Int!): BookMutationResponse
+  registerUser(email: String!, password: String!): LogInResponse
+  editBook(bookId: Int!, yearOfPublication: Int, rating: Int): BookMutationResponse
+}
