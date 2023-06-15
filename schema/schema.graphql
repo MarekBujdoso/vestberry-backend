@@ -91,10 +91,10 @@ type GetAllBooksResponse {
 
 type Query {
   logIn(email: String!, password: String!): LogInResponse
-  getAllFreeBooks: GetAllBooksResponse
+  getAllAvailableBooks(skip: Int, take: Int): GetAllBooksResponse
   getBookByIdAndDate(id: Int!, stringDate: String!): GetBookResponse
-  findBooksByTitle(title: String!): FindBooksResponse
-  findBooksByAuthor(author: String!): FindBooksResponse
+  findBooksByTitle(title: String!, skip: Int, take: Int): FindBooksResponse
+  findBooksByAuthor(author: String!, skip: Int, take: Int): FindBooksResponse
 }
 
 type BookMutationResponse {

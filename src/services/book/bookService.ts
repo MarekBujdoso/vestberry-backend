@@ -1,4 +1,4 @@
-import {BookStatus, PrismaClient} from '@prisma/client'
+import {BookChanges, BookStatus, Prisma, PrismaClient} from '@prisma/client'
 import {Genres} from '../../gql/resolvers-types'
 
 const prisma = new PrismaClient()
@@ -15,6 +15,41 @@ interface BookChange {
   bookId: number;
   yearOfPublication?: number;
   rating?: number;
+}
+
+interface ExtendedBookChange extends BookChanges {
+  title: string,
+  author: string,
+  bookChangeId: number,
+}
+
+async function getAllBooks (relatedDate: Date, skip?: number, take?: number, tx: Prisma.TransactionClient = prisma) {
+  const bookChanges: ExtendedBookChange[] = await tx.$queryRaw`SELECT * FROM get_book_changes_by_date(${relatedDate}) 
+  WHERE status != 'DELETED'`
+
+  const books = await tx.book.findMany({
+    skip,
+    take,
+    where: {
+      id: {
+        in: bookChanges.map((bookChange) => bookChange.bookId),
+      },
+    },
+    include: {
+      changes: {
+        where: {
+          id: {
+            in: bookChanges.map((bookChange) => bookChange.bookChangeId),
+          },
+        },
+        include: {
+          createdBy: true,
+        },
+      },
+    },
+  })
+
+  return books
 }
 
 async function findLastBookChange (bookId: number) {
@@ -40,6 +75,30 @@ async function findLastBookChange (bookId: number) {
   return lastBookChange
 }
 
+async function findAllBooksBy (attribute: string, value: string, skip?: number, take?: number) {
+  const books = await prisma.book.findMany({
+    skip,
+    take,
+    where: {
+      [attribute]: {
+        contains: value,
+      },
+    },
+    include: {
+      changes: {
+        include: {
+          createdBy: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      },
+    },
+  })
+
+  return books
+}
+
 class BookService {
   async addBook ({title, author, yearOfPublication, rating, genres}: Book, userId: number) {
     const findBook = await prisma.book.findUnique({where: {title}})
@@ -61,10 +120,6 @@ class BookService {
         createdById: userId,
       }
     })
-
-    // await prisma.genre.createMany({
-    //   data: genres.map((name: Genres) => ({name, bookChangeId: newBookChange.id}))
-    // })
 
     return await prisma.book.findUnique({
       where: {
@@ -147,6 +202,26 @@ class BookService {
         },
       },
     })
+  }
+
+  async getAllBooks (relatedDate: Date, skip?: number, take?: number) {
+    return await getAllBooks(relatedDate, skip, take)
+  }
+
+  async findBooksByTitle (title: string, skip?: number, take?: number) {
+    const books = await findAllBooksBy('title', title, skip, take)
+
+    return books
+      .filter(({changes}) => changes.length > 0 && changes[0].status !== 'DELETED')
+      .map((book) => ({...book, changes: [book.changes[0]]}))
+  }
+
+  async findBooksByAuthor (author: string, skip?: number, take?: number) {
+    const books = await findAllBooksBy('author', author, skip, take)
+
+    return books
+      .filter(({changes}) => changes.length > 0 && changes[0].status !== 'DELETED')
+      .map((book) => ({...book, changes: [book.changes[0]]}))
   }
 }
 

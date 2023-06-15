@@ -1,11 +1,5 @@
 import {MutationResolvers} from '../gql/resolvers-types'
-
-const UNAUTHENTICATED_BOOK_RESPONSE = {
-  code: '401',
-  success: false,
-  message: 'Unauthorized',
-  book: null,
-}
+import {UNAUTHENTICATED_BOOK_RESPONSE} from './resolverConstants.js'
 
 // Use the generated `MutationResolvers` type to type check our mutations!
 const mutations: MutationResolvers = {

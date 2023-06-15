@@ -1,56 +1,19 @@
-import {BookChanges, Prisma, PrismaClient} from '@prisma/client'
 import {QueryResolvers} from '../gql/resolvers-types'
-// import authorization from '../services/user/authorization'
-
-const prisma = new PrismaClient()
-
-interface ExtendedBookChange extends BookChanges {
-  title: string,
-  author: string,
-  bookChangeId: number,
-}
-
-export const getAllBooks = async (relatedDate: Date, tx: Prisma.TransactionClient = prisma) => {
-  const bookChanges: ExtendedBookChange[] = await tx.$queryRaw`SELECT * FROM get_book_changes_by_date(${relatedDate}) 
-  WHERE status != 'DELETED'`
-
-  const books = await tx.book.findMany({
-    where: {
-      id: {
-        in: bookChanges.map((bookChange) => bookChange.bookId),
-      },
-    },
-    include: {
-      changes: {
-        where: {
-          id: {
-            in: bookChanges.map((bookChange) => bookChange.bookChangeId),
-          },
-        },
-        include: {
-          createdBy: true,
-        },
-      },
-    },
-  })
-
-  return books
-}
+import {
+  UNAUTHENTICATED_BOOK_RESPONSE,
+  UNAUTHENTICATED_BOOKS_RESPONSE,
+  UNAUTHORIZED_USER_RESPONSE
+} from './resolverConstants.js'
 
 // Use the generated `QueryResolvers` type to type check our queries!
 const queries: QueryResolvers = {
   Query: {
-    getAllFreeBooks: async (_, __, {isAuthenticated}) => {
+    getAllAvailableBooks: async (_, {skip, take}, {bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          books: [],
-        }
+        return UNAUTHENTICATED_BOOKS_RESPONSE
       }
 
-      const books = await getAllBooks(new Date(), prisma)
+      const books = await bookAPI.getAllBooks(new Date(), skip, take)
 
       return {
         code: '200',
@@ -59,17 +22,12 @@ const queries: QueryResolvers = {
         books,
       }
     },
-    getBookByIdAndDate: async (_, {id, stringDate}, {isAuthenticated}) => {
+    getBookByIdAndDate: async (_, {id, stringDate, skip, take}, {bookAPI, isAuthenticated}) => {
       if (!isAuthenticated) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          book: null,
-        }
+        return UNAUTHENTICATED_BOOK_RESPONSE
       }
 
-      const books = await getAllBooks(new Date(stringDate), prisma)
+      const books = await bookAPI.getAllBooks(new Date(stringDate), skip, take)
       const book = books.find(({id: bookId}) => bookId === id)
 
       return {
@@ -79,21 +37,8 @@ const queries: QueryResolvers = {
         book,
       }
     },
-    findBooksByTitle: async (_, {title}) => {
-      const books = await prisma.book.findMany({
-        where: {
-          title: {
-            contains: title,
-          },
-        },
-        include: {
-          changes: {
-            include: {
-              createdBy: true,
-            },
-          },
-        },
-      })
+    findBooksByTitle: async (_, {title, skip, take}, {bookAPI}) => {
+      const books = await bookAPI.findBooksByTitle(title, skip, take)
 
       return {
         code: '200',
@@ -102,21 +47,8 @@ const queries: QueryResolvers = {
         books,
       }
     },
-    findBooksByAuthor: async (_, {author}) => {
-      const books = await prisma.book.findMany({
-        where: {
-          author: {
-            contains: author,
-          },
-        },
-        include: {
-          changes: {
-            include: {
-              createdBy: true,
-            },
-          },
-        },
-      })
+    findBooksByAuthor: async (_, {author, skip, take}, {bookAPI}) => {
+      const books = await bookAPI.findBooksByAuthor(author, skip, take)
 
       return {
         code: '200',
@@ -129,12 +61,7 @@ const queries: QueryResolvers = {
       const user = await authAPI.login(email, password)
 
       if (!user) {
-        return {
-          code: '401',
-          success: false,
-          message: 'Unauthorized',
-          user: null,
-        }
+        return UNAUTHORIZED_USER_RESPONSE
       }
 
       return {
