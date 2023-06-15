@@ -1,3 +1,18 @@
+# Test backend assignment - solution
+
+## Installation steps
+1. install docker (follow [these instructions](https://docs.docker.com/get-docker/))
+2. install docker-compose (for older versions) (follow [these instructions](https://docs.docker.com/compose/install/))
+3. run `docker-compose up -d` in the project root to start PostgreSQL docker container
+
+### Local run
+1. run `cp .env.example .env` to create local dotenv file
+2. update `.env` environmental variables if needed
+3. run `npx prisma migrate dev` to create tables in the PostgreSQL database based on prisma scheme
+4. run `npm run seed-data` to seed base users and books to the database
+5. run `npm start` to start the application
+
+
 # Test backend assignment
 
 Task is to create backend application in Node.js using any SQL database. This application should communicate with frontend via GraphQL. There is no need to do frontend in this assessment. You can use any libraries you may consider useful. The assessment is to create an application for book catalogue.
