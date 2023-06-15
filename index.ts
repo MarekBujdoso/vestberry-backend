@@ -54,4 +54,7 @@ const {url} = await startStandaloneServer(server, {
 
 console.debug(`🚀  Server is running at: ${url}`)
 
-console.debug(encode({id: 1, email: 'aaa@vestberry.com'}))
+console.debug(`
+*** Only for testing ***
+user: "aaa@vestberry.com"
+token:"${encode({id: 1, email: 'aaa@vestberry.com'})}"`)
