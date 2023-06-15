@@ -25,7 +25,6 @@ class Authorization {
       data: {email, password}
     })
 
-    console.log('new user', newUser)
     return newUser
   }
 
